@@ -1,9 +1,9 @@
-Необходимо сконфигурировать pbuilder
+Необходимо сконфигурировать pbuilder:
 ./1_configure_pbuilder.sh
 
-затем создать basetgz
+затем создать basetgz:
 ./2_create_basetgz.sh
 
-и залогиниться
+и залогиниться:
 ./3_login.sh
 
