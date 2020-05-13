@@ -1,0 +1,4 @@
+#! /bin/bash
+
+#Add manual apt config
+echo 'Acquire::Check-Valid-Until "0";'>/etc/apt/apt.conf.d/01vega

@@ -1,0 +1,9 @@
+BUILDPLACE=/home/pbuilder/build
+BUILDRESULT=/home/pbuilder/buildresult
+BUILDDIR=/builddir
+LOGLEVEL="D"
+#PBUILDERSATISFYDEPENDSCMD=/usr/lib/pbuilder/pbuilder-satisfydepends-apt
+PBUILDERSATISFYDEPENDSCMD=/usr/lib/pbuilder/pbuilder-satisfydepends
+HOOKDIR=/etc/pbuilder/hooks/default
+BINDMOUNTS="/proc /dev/pts /dev/shm /srv"
+BUILD_HOME=/root

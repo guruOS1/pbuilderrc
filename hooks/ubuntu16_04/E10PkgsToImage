@@ -1,0 +1,17 @@
+#! /bin/bash
+
+#BAD hack for install aptitude before create system image.
+apt-get -y install aptitude
+
+#install editor
+apt-get -y install vim
+
+#install reprepro for create tmp repository
+apt-get -y install reprepro
+
+#install debhelper
+apt-get -y install debhelper
+
+#install pbuilder
+apt-get -y --force-yes install pbuilder
+

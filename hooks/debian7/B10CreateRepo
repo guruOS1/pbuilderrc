@@ -1,0 +1,25 @@
+#! /bin/bash
+
+ch_files=`ls /build/*.changes`
+repo="/var/cache/pbuilder/tmprepo"
+codename="pbuilder"
+
+#create r3po conf
+mkdir -p ${repo}/conf
+repconf=${repo}/conf/distributions
+if [ ! -f ${repconf} ];then
+    echo "Origin: Vega">${repconf}
+    echo "Codename: ${codename}">>${repconf}
+    echo "Architectures: amd64 source">>${repconf}
+    echo "Components: main contrib non-free vega">>${repconf}
+    echo "UDebComponents: main contrib non-free vega">>${repconf}
+fi
+
+#create repo
+for chfile in $ch_files;do
+    echo ${chfile}
+    reprepro -b ${repo} \
+             --ignore=wrongdistribution \
+             --ignore=missingfile \
+             include ${codename} ${chfile}
+done

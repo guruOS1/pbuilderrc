@@ -1,0 +1,58 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for overwriting defaults in
+# the default template
+#
+# read pbuilderrc.5 document for notes on specific options.
+
+EXTRAPACKAGES="aptitude"
+
+BUILDPLACE=$(mktemp -d)
+
+COMPRESSPROG=gzip
+BASETGZ=/var/cache/pbuilder/base.debian9.tgz
+
+RepoURL="repo"
+
+MIRRORSITE=ftp://${RepoURL}/debian
+
+COMPONENTS="main contrib non-free"
+
+DISTRIBUTION=stretch
+
+OTHERMIRROR="
+deb ftp://${RepoURL}/debian stretch-updates contrib main non-free|
+deb ftp://${RepoURL}/vega/repo_debian9 stretch contrib main non-free vega|
+deb ftp://${RepoURL}/vega/repo_debian9 stretch_bin contrib main non-free vega|
+deb ftp://${RepoURL}/vega/repo_debian9 stretch_gis contrib main non-free vega
+"
+
+HOOKDIR=/var/cache/pbuilder/hooks/debian9
+
+APTCACHE=/var/cache/pbuilder/aptcache/debian9
+
+BINDMOUNTS="/var/cache/pbuilder/tmprepo/"
+
+DEBOOTSTRAP="/usr/sbin/debootstrap"
+DEBOOTSTRAPOPTS=(
+    '--components=main,contrib,non-free'
+    '--variant=minbase'
+    '--no-check-gpg'
+    )
+
+APTITUDEGETOPT=(
+    '-y'
+    )
+APTGETOPT=(
+    '-y'
+    )
+ALLOWUNTRUSTED=yes
+
+AUTO_DEBSIGN=${AUTO_DEBSIGN: -no}
+
+PKGNAME_LOGFILE=yes
+PKGNAME_LOGFILE_EXTENSION=_$(dpkg --print-architecture).build
+
+#pdbuild
+
+USE_PDEBUILD_INTERNAL=yes

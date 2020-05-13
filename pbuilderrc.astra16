@@ -1,0 +1,56 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for overwriting defaults in
+# the default template
+#
+# read pbuilderrc.5 document for notes on specific options.
+
+EXTRAPACKAGES="aptitude"
+
+BUILDPLACE=$(mktemp -d)
+
+COMPRESSPROG=gzip
+BASETGZ=/var/cache/pbuilder/base.astra16.tgz
+
+RepoURL="repo"
+
+MIRRORSITE=ftp://${RepoURL}/astra/1.6se-install
+
+COMPONENTS="main contrib non-free"
+
+DISTRIBUTION=smolensk
+
+OTHERMIRROR="
+deb ftp://${RepoURL}/astra/1.6se-devel smolensk contrib main non-free
+"
+
+HOOKDIR=/var/cache/pbuilder/hooks/astra16
+
+APTCACHE=/var/cache/pbuilder/aptcache/astra16
+
+BINDMOUNTS="/var/cache/pbuilder/tmprepo"
+
+DEBOOTSTRAP="/usr/sbin/debootstrap"
+DEBOOTSTRAPOPTS=(
+    '--components=main,contrib,non-free'
+    '--variant=minbase'
+    '--no-check-gpg'
+    )
+
+APTITUDEGETOPT=(
+    '-y'
+    )
+APTGETOPT=(
+    '-y'
+    )
+ALLOWUNTRUSTED=yes
+
+AUTO_DEBSIGN=${AUTO_DEBSIGN: -no}
+
+
+PKGNAME_LOGFILE=yes
+PKGNAME_LOGFILE_EXTENSION=_$(dpkg --print-architecture).build
+
+#pdbuild
+
+USE_PDEBUILD_INTERNAL=yes

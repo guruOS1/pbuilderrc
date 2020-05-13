@@ -1,0 +1,56 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for overwriting defaults in
+# the default template
+#
+# read pbuilderrc.5 document for notes on specific options.
+
+BASETGZ=/var/cache/pbuilder/base.astra14.tgz
+
+RepoURL="repo"
+
+MIRRORSITE=ftp://${RepoURL}/astra/1.4se-install
+
+COMPONENTS="main contrib non-free"
+
+DISTRIBUTION=smolensk
+
+OTHERMIRROR="
+deb ftp://${RepoURL}/astra/1.4se-devel smolensk contrib main non-free|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14_dutils main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14_gst10 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14_deb7 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14_qgis main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra14 astra14_bin main contrib non-free vega
+"
+
+HOOKDIR=/var/cache/pbuilder/hooks/astra14
+
+APTCACHE=/var/cache/pbuilder/aptcache/astra14
+
+BINDMOUNTS="/var/cache/pbuilder/tmprepo"
+
+DEBOOTSTRAPOPTS=(
+    '--components=main,contrib,non-free'
+    '--variant=minbase'
+    '--no-check-gpg'
+    )
+
+APTITUDEGETOPT=(
+    '-y'
+    )
+APTGETOPT=(
+    '-y'
+    )
+ALLOWUNTRUSTED=yes
+
+AUTO_DEBSIGN=${AUTO_DEBSIGN: -no}
+
+
+PKGNAME_LOGFILE=yes
+PKGNAME_LOGFILE_EXTENSION=_$(dpkg --print-architecture).build
+
+#pdbuild
+
+USE_PDEBUILD_INTERNAL=yes

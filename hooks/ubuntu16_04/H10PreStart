@@ -1,0 +1,99 @@
+#! /bin/bash
+
+export LC_ALL=C.UTF-8
+
+RepoURL="repo"
+codename="pbuilder"
+
+#CSV parse
+if [ -n "$CSV" ];then
+    PBROOT=`echo ${CSV}| awk -F '|' '{print $1}'`
+    XAUTH=`echo ${CSV}| awk -F '|' '{print $2}'`
+fi
+
+repo_add(){
+    cat /etc/apt/sources.list|grep "$repo" >/dev/null 2>&1
+    if [ $? -ne 0 ];then
+        echo "$repo" >>/etc/apt/sources.list
+    fi
+}
+
+repo_del(){
+    sed -i "/$repo/d" /etc/apt/sources.list
+}
+
+#add pod repo
+#repo="deb ftp://${RepoURL}/vega training main contrib non-free vega"
+#repo_add
+
+# add or remove tmprepo
+repo="deb file:/var/cache/pbuilder/tmprepo ${codename} main contrib non-free vega"
+if [ -f /var/cache/pbuilder/tmprepo/dists/${codename}/main/binary-amd64/Packages ];then
+    repo_add
+else
+    repo_del
+fi
+    apt-get update
+
+#bashrc
+if [ "$PBROOT" != "$HOME" ];then
+    echo "cd $PBROOT">$HOME/.bashrc
+fi
+
+# X forvard
+# X redirect only from ssh -X
+if [ "$XAUTH" != "" ];then
+    echo "Start X Display"
+    apt-get -y install xauth
+    xauth add ${XAUTH}
+else
+    echo "Start Console mode"
+fi
+
+#src_arch & svn_sync
+if [ "$((echo $SUDO_COMMAND| grep pdebuild)||false)" ];then
+    cd `echo $SUDO_COMMAND| awk -F ' -- ' '{print $2}'| awk '{print $2}'`
+
+    #svn_upd
+    ARGS="--username hudson --password Had11ason512 --no-auth-cache --non-interactive"
+    if [ -n "${SVN_REV}" ];then
+        echo "SVN REVISION SELECT: ${SVN_REV}"
+    fi
+    if [ -d .svn ];then
+        apt-get -y install iputils-ping
+        ping -c 3 svn.unit.spb
+        if [ $? -eq 0 ];then
+            apt-get -y install subversion
+            if [ -n "${SVN_REV}" ];then
+                echo "SVN REVISION UPDATE: ${SVN_REV}"
+                svn up ${ARGS} -r ${SVN_REV}
+                if [ $? -ne 0 ];then
+                    echo "REVISION ${SVN_REV} FAILED, UPDATE TO LAST REVISION"
+                    svn up ${ARGS}
+                fi
+            else
+                echo "SVN REVISION UPDATE: LAST"
+                svn up ${ARGS}
+            fi
+        else
+            echo "SVN REPOSIRORY DENIED"
+        fi
+    else
+        echo "SVN REPOSIRORY NOT FOUND"
+    fi
+
+    #changelog
+    if [ -f debian/changelog.sh ];then
+        sh debian/changelog.sh > debian/changelog
+    fi
+
+    #src_arch
+    SOURCE_NAME=$(dpkg-parsechangelog | egrep '^Source:'| cut -f 2 -d ' ')
+    SOURCE_VER=$(dpkg-parsechangelog | egrep '^Version:'| cut -f 2 -d ' '| cut -f 1 -d '-')
+    echo $SOURCE_VER|grep ":" && SOURCE_VER=$(echo $SOURCE_VER|awk -F ":" '{print $2}')
+    rm ../${SOURCE_NAME}_${SOURCE_VER}.orig.tar.{xz,gz,bz2}
+    tar cJpf ../${SOURCE_NAME}_${SOURCE_VER}.orig.tar.xz ./ --exclude='./debian'
+
+    #finalize
+    cd /
+fi

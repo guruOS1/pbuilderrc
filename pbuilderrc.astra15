@@ -1,0 +1,60 @@
+# this is your configuration file for pbuilder.
+# the file in /usr/share/pbuilder/pbuilderrc is the default template.
+# /etc/pbuilderrc is the one meant for overwriting defaults in
+# the default template
+#
+# read pbuilderrc.5 document for notes on specific options.
+
+EXTRAPACKAGES="aptitude"
+
+BUILDPLACE=$(mktemp -d)
+COMPRESSPROG=gzip
+BASETGZ=/var/cache/pbuilder/base.astra15.tgz
+
+RepoURL="repo"
+
+MIRRORSITE=ftp://${RepoURL}/astra/1.5se-install
+
+COMPONENTS="main contrib non-free"
+
+DISTRIBUTION=smolensk
+
+OTHERMIRROR="
+deb ftp://${RepoURL}/astra/1.5se-devel smolensk contrib main non-free|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15_dutils main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15_gst10 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15_deb7 main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15_qgis main contrib non-free vega|
+deb ftp://${RepoURL}/vega/repo_astra15 astra15_bin main contrib non-free vega
+"
+
+HOOKDIR=/var/cache/pbuilder/hooks/astra15
+
+APTCACHE=/var/cache/pbuilder/aptcache/astra15
+
+BINDMOUNTS="/var/cache/pbuilder/tmprepo/"
+
+DEBOOTSTRAP="/usr/sbin/debootstrap"
+DEBOOTSTRAPOPTS=(
+    '--components=main,contrib,non-free'
+    '--variant=minbase'
+    '--no-check-gpg'
+    )
+
+APTITUDEGETOPT=(
+    '-y'
+    )
+APTGETOPT=(
+    '-y'
+    )
+ALLOWUNTRUSTED=yes
+
+AUTO_DEBSIGN=${AUTO_DEBSIGN: -no}
+
+PKGNAME_LOGFILE=yes
+PKGNAME_LOGFILE_EXTENSION=_$(dpkg --print-architecture).build
+
+#pdbuild
+
+USE_PDEBUILD_INTERNAL=yes
